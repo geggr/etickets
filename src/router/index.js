@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from '../pages/Home.vue'
 import Dashboard from '../pages/Dashboard.vue'
+import Event from '../pages/Event.vue'
 
 const routes = [
     {
@@ -13,6 +14,12 @@ const routes = [
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard
+    },
+    {
+        path: '/event/:id',
+        name: 'Event',
+        component: Event,
+        props: true
     }
 ]
 

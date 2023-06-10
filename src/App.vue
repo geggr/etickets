@@ -1,6 +1,6 @@
 <template>
-  <router-view/>
-  <modals-container/>
+    <router-view />
+    <modals-container />
 </template>
 
 <script setup>
