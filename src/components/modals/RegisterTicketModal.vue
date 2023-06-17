@@ -10,7 +10,7 @@
             <div>
                 <label>
                     <span>Evento</span>
-                    <input class="block w-full border border-black rounded p-2" type="text" v-model="name"
+                    <input class="block w-full border border-black rounded p-2" type="text" v-model="title"
                         placeholder="Digite o nome do evento...">
                 </label>
             </div>
@@ -43,7 +43,7 @@
             <div>
                 <label>
                     <span>Data</span>
-                    <input class="block w-full border border-black rounded p-2" type="text" v-model="date"
+                    <input class="block w-full border border-black rounded p-2" type="date" v-model="date"
                         placeholder="Selecione a data do show">
                 </label>
             </div>
@@ -70,6 +70,7 @@
 import { useForm } from '@vorms/core';
 import { reactive } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
+import FakeHTTPClient from '../../http/FakeHTTPClient';
 
 const status = reactive({
     isValidating: false,
@@ -100,22 +101,28 @@ const { register, errors, handleSubmit } = useForm({
         place: '',
         date: '',
     },
-    onSubmit(values) {
+    async onSubmit(values) {
+
+        const parsed = {
+            ...values,
+            date: new Date(values.date)
+        }
+
         status.isValidating = true
+
+        // await FakeHTTPClient.register(parsed)
+
         setTimeout(() => {
             status.approve()
-            emit('submit', values)
+            emit('submit', parsed)
         }, 1500)
 
     }
 })
 
-const { value: name } = register('name')
+const { value: title } = register('title')
 const { value: code } = register('code')
 const { value: local } = register('local')
 const { value: place } = register('place')
 const { value: date } = register('date')
-
-
-
 </script>

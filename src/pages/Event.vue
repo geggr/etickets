@@ -87,8 +87,7 @@ const { open, close } = useModal({
             close()
         },
         onConfirm(ticketSelectedForTrade) {
-            console.log(ticketSelectedForTrade)
-            close()
+            setTimeout(() => close(), 5000)
         }
     }
 })

@@ -28,8 +28,6 @@ const {
     'date': Date
 })
 
-console.log(vertical)
-
 const position = reactive({
     'grid-cols-[350px] grid-rows-[200px,150px]': vertical,
     'grid-rows-[200px] grid-cols-[250px,350px]': !vertical
@@ -37,7 +35,7 @@ const position = reactive({
 
 const [day, month] = new Intl
     .DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': 'short' })
-    .format(new Date(date))
+    .format(date)
     .split(" de ")
 
 </script>
