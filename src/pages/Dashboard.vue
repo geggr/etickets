@@ -11,7 +11,7 @@
 
             <div class="flex flex-wrap gap-x-8 gap-y-10 mt-8">
                 <event-card v-for="(ticket, index) in state.numberOfTickets" :index="ticket.id" :title="ticket.title"
-                    :date="ticket.date" :vertical="false" />
+                    :image="ticket.image" :date="ticket.date" :vertical="false" />
             </div>
 
 
@@ -25,8 +25,15 @@
                 </div>
 
                 <events-card-container>
-                    <event-card vertical v-for="(ticket, index) in state.numberOfSearch" :key="ticket.id"
-                        :title="ticket.title" :date="ticket.date" v-show="ticket.visible" />
+                    <event-card vertical v-for="(ticket, index) in state.numberOfSearch" @click="router.push({
+                        name: 'Event',
+                        params: {
+                            id: ticket.id
+                        },
+                        query: {
+                            kind: ticket.image.kind
+                        }
+                    })" :key="ticket.id" :title="ticket.title" :date="ticket.date" v-show="ticket.visible" />
                 </events-card-container>
 
             </div>
@@ -46,6 +53,7 @@
 </template>
 
 <script setup>
+import { ref, watch, reactive, onMounted } from 'vue';
 import Confetti from 'vue-confetti-explosion'
 import { useModal } from 'vue-final-modal';
 import RegisterTicketModal from '../components/modals/RegisterTicketModal.vue'
@@ -53,17 +61,16 @@ import Container from '../components/Container.vue';
 import EventCard from '../components/EventCard.vue';
 import LoggedHeader from '../components/Header.vue'
 import EventsCardContainer from '../components/EventsCardContainer.vue';
-import { ref } from 'vue';
-import { nextTick } from 'vue';
-import { reactive } from 'vue';
-import { onMounted } from 'vue';
 import FakeHTTPClient from '../http/FakeHTTPClient';
-import { watch } from 'vue';
+import { setTickets } from '../store/user';
+import { useRouter } from 'vue-router';
+
+import FakeImageHttpClient from '../http/FakeImageHttpClient';
+
+const router = useRouter()
 
 const visible = ref(false)
 const search = ref("")
-
-
 
 const state = reactive({
     numberOfTickets: [],
@@ -74,9 +81,12 @@ const state = reactive({
 onMounted(async () => {
     const response = await FakeHTTPClient.dashboard()
 
-    state.numberOfTickets = response.tickets
-    state.numberOfSearch = response.latest.map(it => ({ ...it, visible: true }))
-    state.numberOfTicketsForYou = response.selecteds
+    state.numberOfTickets = response.tickets.map(it => ({ ...it, image: FakeImageHttpClient.randomImage }))
+    state.numberOfSearch = response.latest.map(it => ({ ...it, image: FakeImageHttpClient.randomImage, visible: true }))
+    state.numberOfTicketsForYou = response.selecteds.map(it => ({ ...it, image: FakeImageHttpClient.randomImage }))
+
+
+    setTickets(response.tickets)
 })
 
 watch(search, (current, _) => {

@@ -1,5 +1,7 @@
 export default class FakeHTTPClient {
 
+    constructor() { }
+
     static database = Array
         .from({ length: 12 }, (_, index) => index)
         .reduce((accumulator, current) => {
@@ -22,15 +24,13 @@ export default class FakeHTTPClient {
         ]
     }
 
-    constructor() { }
-
     getClientToken() {
 
     }
 
     static async login({ email, _password }) {
-        // MVP
-        localStorage.setItem("key", email)
+        localStorage.setItem("email", email)
+
     }
 
     static async register(ticket) {

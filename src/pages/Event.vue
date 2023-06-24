@@ -2,7 +2,7 @@
     <logged-header />
 
     <container class="mt-4">
-        <div class="event-banner block w-full h-60 rounded-3xl"></div>
+        <div class="event-banner block w-full h-60 rounded-3xl" :style="{ backgroundImage: banner }"></div>
         <h1 class="font-display text-3xl">{{ event.title }}</h1>
         <p class="mt-8 text-lg max-w-3xl">
             {{ event.description }}
@@ -46,19 +46,23 @@ import Container from '../components/Container.vue';
 import LoggedHeader from '../components/Header.vue'
 import TradeTicketModal from '../components/modals/TradeTicketModal.vue';
 import { useModal } from 'vue-final-modal';
+import state from '../store/user';
+import { useRoute } from 'vue-router';
+import FakeImageHttpClient from '../http/FakeImageHttpClient';
 
 const { id } = defineProps([
     'id'
 ])
+
+const route = useRoute()
+
+const kind = route.query.kind
+
 const selected = reactive({
     ticket: {}
 })
 
-const userTickets = [
-    { country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista Premium' },
-    { country: 'Brazil', date: new Date('11-12-2021'), sector: 'Pista' },
-    { country: 'Brazil', date: new Date('11-13-2021'), sector: 'Cadeira' },
-]
+const userTickets = state.tickets
 
 const event = {
     title: 'Coldplay: Music of Spheres',
@@ -75,6 +79,8 @@ const event = {
         { id: 6, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Cadeira Inferior' },
     ]
 }
+
+const banner = `url(/src/assets/banners/${FakeImageHttpClient.findByKind(kind).banner}`
 
 const formatter = new Intl.DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': 'long', year: 'numeric' })
 
@@ -101,7 +107,6 @@ function buildTradeModal(ticket) {
 
 <style scoped>
 .event-banner {
-    background: url('../assets/mocks/event-cover.png');
     background-repeat: no-repeat;
     background-size: 100%;
     background-position: center;

@@ -1,6 +1,6 @@
 <template>
     <div class="rounded-lg shadow-lg grid hover:shadow-xl border border-gray-200 hover:border-brand-main" :class="position">
-        <div class="event-header h-full max-w-full"></div>
+        <div class="event-header h-full max-w-full" :style="{ backgroundImage: imageSource }"></div>
         <div class="flex flex-row items-center justify-between gap-8 px-4">
             <div class="font-bold text-2xl">
                 <span class="text-brand-main">{{ month }}</span>
@@ -16,17 +16,21 @@
 
 <script setup>
 import { reactive } from 'vue';
-
+import FakeImageHttpClient from '../http/FakeImageHttpClient';
 
 const {
     title,
     vertical = true,
+    image = FakeImageHttpClient.randomImage,
     date = Date.now()
 } = defineProps({
     'title': String,
+    'image': String,
     'vertical': Boolean,
     'date': Date
 })
+
+const imageSource = `url(/src/assets/tickets/${image.ticket})`
 
 const position = reactive({
     'grid-cols-[350px] grid-rows-[200px,150px]': vertical,
@@ -42,7 +46,6 @@ const [day, month] = new Intl
 
 <style scoped>
 .event-header {
-    background-image: url('../assets/mocks/event-banner.jpg');
     background-repeat: no-repeat;
     background-size: cover;
 }

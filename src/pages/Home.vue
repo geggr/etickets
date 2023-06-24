@@ -6,16 +6,15 @@
             <h2 class="font-sans text-white text-3xl max-w-2xl text-center">
                 entre para a plataforma de troca de tickets instantâneo e viva os melhores momentos
             </h2>
-            <router-link to="/dashboard"
-                class="bg-[#A32FFF] text-white font-display text-3xl rounded-md py-4 w-1/6 text-center">Entrar</router-link>
+            <button @click="open"
+                class="bg-[#A32FFF] text-white font-display text-3xl rounded-md py-4 w-1/6 text-center">Entrar</button>
         </container>
     </div>
 
     <container class="mt-16">
         <h3 class="text-4xl font-display">Próximos Eventos</h3>
         <ul class="flex flex-wrap gap-x-16 gap-y-16 mt-10">
-            <event-card v-for="(_, index) in numberOfCards" :key="index" title="Coldplay: Music of Spheres"
-                date="04/10/2023" />
+            <event-card v-for="(_, index) in numberOfCards" :key="index" title="Evento " :date="new Date('04-04-2023')" />
         </ul>
         <router-link to="/dashboard"
             class="mt-6 block bg-brand-secondary text-white font-display text-3xl rounded-md py-4 w-1/2 text-center mx-auto">Conhecer
@@ -31,10 +30,32 @@
 </template>
 
 <script setup>
+import { useModal } from 'vue-final-modal';
+
 import Container from '../components/Container.vue';
 import EventCard from '../components/EventCard.vue';
+import LoginModal from '../components/modals/LoginModal.vue';
+import { useRouter } from 'vue-router';
+import { setCurrentUser } from '../store/user';
 
 const numberOfCards = new Array(6)
+
+const router = useRouter();
+
+const { open, close } = useModal({
+    component: LoginModal,
+    attrs: {
+        async onSubmit({ email }) {
+            setCurrentUser({
+                email,
+                photo: 'https://randomuser.me/api/portraits/men/68.jpg'
+            })
+
+            router.push({ name: 'Dashboard' })
+            close()
+        }
+    }
+})
 </script>
 
 <style scoped>

@@ -71,7 +71,7 @@ const { tickets, selected } = defineProps(['tickets', 'selected'])
 
 const options = tickets.map((ticket, index) => ({
     index,
-    name: `${ticket.sector} - ${formatter.format(ticket.date)}`
+    name: `${ticket.title} - ${formatter.format(ticket.date)}`
 }))
 
 function cancel() {
