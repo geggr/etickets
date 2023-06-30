@@ -24,17 +24,16 @@ export default class FakeHTTPClient {
         ]
     }
 
-    getClientToken() {
-
-    }
-
     static async login({ email, _password }) {
         localStorage.setItem("email", email)
-
     }
 
     static async register(ticket) {
         FakeHTTPClient.userInformation.tickets.push(ticket)
+    }
+
+    static async homepage() {
+        return FakeHTTPClient.database.slice(6)
     }
 
     static async dashboard() {
@@ -48,16 +47,39 @@ export default class FakeHTTPClient {
         return response
     }
 
-    static async trade(ticket, expected) {
+    static async event() {
+        return {
+            title: 'Coldplay: Music of Spheres',
+            description: `
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+            `,
+            tickets: [
+                { id: 1, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista Premium' },
+                { id: 2, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Inferior' },
+                { id: 3, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Superior' },
+                { id: 4, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista' },
+                { id: 5, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Pista Premium' },
+                { id: 6, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Cadeira Inferior' },
+            ]
+        }
+    }
+
+    static async trade(userTicket, interestTicket) {
+
+        const expected = ((Math.round(Math.random() * 100) % 2) === 0)
+            ? 'HAS_TRADE'
+            : 'CREATED_INTERESS'
+
         if (expected === 'HAS_TRADE') {
             return {
                 status: 'TRADED',
-                oldTicket: { ...ticket },
-                newTicket: { id: 977, code: '#105040', title: 'Evanescence', date: new Date('2023-10-10') }
+                oldTicket: { ...userTicket },
+                newTicket: { ...interestTicket }
             }
         }
 
-        if (expected === 'CREATE_INTERESS') {
+        if (expected === 'CREATED_INTERESS') {
             return {
                 status: 'INTERESS',
             }

@@ -6,34 +6,37 @@
                 <h1 class="text-2xl text-brand-secondary font-bold">Meus Ingressos</h1>
                 <confetti v-if="visible" />
                 <button @click="open"
-                    class="flex items-center justify-center text-white bg-brand-secondary rounded-full w-8 h-8 text-2xl">+</button>
+                        class="flex items-center justify-center text-white bg-brand-secondary rounded-full w-8 h-8 text-2xl">+</button>
             </div>
 
             <div class="flex flex-wrap gap-x-8 gap-y-10 mt-8">
-                <event-card v-for="(ticket, index) in state.numberOfTickets" :index="ticket.id" :title="ticket.title"
-                    :image="ticket.image" :date="ticket.date" :vertical="false" />
+                <event-card v-for="(ticket, index) in state.tickets"
+                            :index="ticket.id"
+                            :title="ticket.title"
+                            :image="ticket.image"
+                            :date="ticket.date"
+                            :vertical="false" />
             </div>
-
 
             <div class="mt-10">
 
                 <div class="flex justify-between">
                     <h2 class="text-3xl uppercase font-display text-brand-primary max-w-xs">Próximos Eventos</h2>
                     <input type="search"
-                        class="w-full block text-white bg-brand-secondary rounded-md placeholder:text-white p-5"
-                        placeholder="Procure aqui..." v-model="search" />
+                           class="w-full block text-white bg-brand-secondary rounded-md placeholder:text-white p-5"
+                           placeholder="Procure aqui..."
+                           v-model="search" />
                 </div>
 
                 <events-card-container>
-                    <event-card vertical v-for="(ticket, index) in state.numberOfSearch" @click="router.push({
-                        name: 'Event',
-                        params: {
-                            id: ticket.id
-                        },
-                        query: {
-                            kind: ticket.image.kind
-                        }
-                    })" :key="ticket.id" :title="ticket.title" :date="ticket.date" v-show="ticket.visible" />
+                    <event-card vertical
+                                v-for="ticket in state.ticketsForSearch"
+                                v-show="ticket.visible"
+                                :key="ticket.id"
+                                :title="ticket.title"
+                                :date="ticket.date"
+                                :image="ticket.image"
+                                @click="routeToEventPage(ticket)" />
                 </events-card-container>
 
             </div>
@@ -42,8 +45,12 @@
             <div class="mt-10">
                 <h2 class="text-3xl uppercase font-display text-brand-primary">Pensados em você</h2>
                 <events-card-container>
-                    <event-card vertical v-for="(ticket, index) in state.numberOfTicketsForYou" :key="ticket.id"
-                        :title="ticket.title" :date="ticket.date" />
+                    <event-card vertical
+                                v-for="ticket in state.ticketsForUser"
+                                :key="ticket.id"
+                                :title="ticket.title"
+                                :date="ticket.date"
+                                :image="ticket.image" />
                 </events-card-container>
             </div>
         </container>
@@ -54,48 +61,63 @@
 
 <script setup>
 import { ref, watch, reactive, onMounted } from 'vue';
-import Confetti from 'vue-confetti-explosion'
 import { useModal } from 'vue-final-modal';
-import RegisterTicketModal from '../components/modals/RegisterTicketModal.vue'
-import Container from '../components/Container.vue';
-import EventCard from '../components/EventCard.vue';
-import LoggedHeader from '../components/Header.vue'
-import EventsCardContainer from '../components/EventsCardContainer.vue';
-import FakeHTTPClient from '../http/FakeHTTPClient';
-import { setTickets } from '../store/user';
 import { useRouter } from 'vue-router';
 
-import FakeImageHttpClient from '../http/FakeImageHttpClient';
+import { setTickets, getTickets } from '../store/user';
+
+import Confetti from 'vue-confetti-explosion'
+import LoggedHeader from '../components/Header.vue'
+import Container from '../components/Container.vue';
+import EventCard from '../components/EventCard.vue';
+import EventsCardContainer from '../components/EventsCardContainer.vue';
+
+import RegisterTicketModal from '../components/modals/RegisterTicketModal.vue'
+
+import TicketService from '../services/TicketService'
 
 const router = useRouter()
+const service = new TicketService()
 
 const visible = ref(false)
 const search = ref("")
 
 const state = reactive({
-    numberOfTickets: [],
-    numberOfSearch: [],
-    numberOfTicketsForYou: []
+    tickets: [],
+    ticketsForSearch: [],
+    ticketsForUser: []
 })
 
+function routeToEventPage(ticket) {
+    router.push({
+        name: 'Event',
+        params: {
+            id: ticket.id
+        },
+        query: {
+            kind: ticket.image.kind
+        }
+    })
+}
+
 onMounted(async () => {
-    const response = await FakeHTTPClient.dashboard()
+    const response = await service.buildDashboardForUser()
 
-    state.numberOfTickets = response.tickets.map(it => ({ ...it, image: FakeImageHttpClient.randomImage }))
-    state.numberOfSearch = response.latest.map(it => ({ ...it, image: FakeImageHttpClient.randomImage, visible: true }))
-    state.numberOfTicketsForYou = response.selecteds.map(it => ({ ...it, image: FakeImageHttpClient.randomImage }))
-
+    console.log(response.latest)
+    state.tickets = response.tickets
+    state.ticketsForSearch = response.latest.map(it => ({ ...it, visible: true }))
+    state.ticketsForUser = response.selecteds
 
     setTickets(response.tickets)
 })
 
 watch(search, (current, _) => {
     if (current === "") {
-        state.numberOfSearch.forEach(it => it.visible = true)
+        state.ticketsForSearch.forEach(it => it.visible = true)
         return
     }
 
-    state.numberOfSearch.forEach(it => {
+    state.ticketsForSearch.forEach(it => {
         const shouldShowEvent = it.title.toUpperCase().includes(current.toUpperCase())
         it.visible = shouldShowEvent
     })
@@ -105,7 +127,7 @@ const { open, close } = useModal({
     component: RegisterTicketModal,
     attrs: {
         async onSubmit(ticket) {
-            state.numberOfTickets.push(ticket)
+            state.tickets.push(ticket)
             close()
         }
     }

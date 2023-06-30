@@ -41,48 +41,38 @@
     </container>
 </template>
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useModal } from 'vue-final-modal';
+
+import state from '../store/user';
+
 import Container from '../components/Container.vue';
 import LoggedHeader from '../components/Header.vue'
 import TradeTicketModal from '../components/modals/TradeTicketModal.vue';
-import { useModal } from 'vue-final-modal';
-import state from '../store/user';
-import { useRoute } from 'vue-router';
 import FakeImageHttpClient from '../http/FakeImageHttpClient';
 
-const { id } = defineProps([
-    'id'
-])
+import TicketService from '../services/TicketService'
 
+const { id } = defineProps(['id'])
+
+const service = new TicketService()
 const route = useRoute()
-
 const kind = route.query.kind
 
-const selected = reactive({
-    ticket: {}
-})
+const event = ref({})
+const selected = ref({})
 
 const userTickets = state.tickets
-
-const event = {
-    title: 'Coldplay: Music of Spheres',
-    description: `
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-        when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-    `,
-    tickets: [
-        { id: 1, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista Premium' },
-        { id: 2, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Inferior' },
-        { id: 3, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Superior' },
-        { id: 4, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista' },
-        { id: 5, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Pista Premium' },
-        { id: 6, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Cadeira Inferior' },
-    ]
-}
 
 const banner = `url(/src/assets/banners/${FakeImageHttpClient.findByKind(kind).banner}`
 
 const formatter = new Intl.DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': 'long', year: 'numeric' })
+
+onMounted(async () => {
+    const response = await service.loadEvent()
+    event.value = response
+})
 
 const { open, close } = useModal({
     component: TradeTicketModal,
@@ -99,7 +89,7 @@ const { open, close } = useModal({
 })
 
 function buildTradeModal(ticket) {
-    selected.ticket = ticket
+    selected.value = ticket
     open()
 }
 

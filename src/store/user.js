@@ -9,7 +9,6 @@ const initialState = {
 
 let state = reactive(initialState)
 
-
 export function addTicket(ticket) {
     state.tickets.push(ticket)
 }
@@ -27,8 +26,10 @@ export function setCurrentUser(user) {
 
 export function setTickets(tickets) {
     state.tickets = tickets
+}
 
-    console.log(JSON.stringify(state))
+export function getTickets() {
+    return state.tickets
 }
 
 export default state

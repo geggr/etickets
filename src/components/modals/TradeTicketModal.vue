@@ -8,7 +8,7 @@
                 Trocar o Ticket?
             </h1>
 
-            <p> Qual ticket deseja usar na troca por? {{ selected.ticket.sector }}</p>
+            <p> Qual ticket deseja usar na troca por? {{ selected.title }}</p>
             <VueMultiSelect v-model="current" :options="options" track-by="index" label="name" />
 
             <div class="mt-10 flex gap-x-20 text-white">
@@ -37,11 +37,17 @@
 </template>
 
 <script setup>
-import { VueFinalModal } from 'vue-final-modal';
-import { ref } from 'vue';
 import VueMultiSelect from 'vue-multiselect'
-import { reactive } from 'vue';
-import FakeHTTPClient from '../../http/FakeHTTPClient';
+
+import { ref, reactive } from 'vue';
+import { VueFinalModal } from 'vue-final-modal';
+
+import TicketService from '../../services/TicketService'
+
+const { tickets, selected } = defineProps(['tickets', 'selected'])
+const emit = defineEmits(['confirm', 'close'])
+const current = ref(null)
+const service = new TicketService()
 
 const state = reactive({
     searching: false,
@@ -57,17 +63,11 @@ const state = reactive({
         return this.searching === false && this.response === "TRADED"
     },
     hasInteressed() {
-        return this.searching === false && this.response === "INTERESS"
+        return this.searching === false && this.response === "CREATED_INTERESS"
     }
 })
 
-const emit = defineEmits(['confirm', 'close'])
-
 const formatter = new Intl.DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': '2-digit', year: 'numeric' })
-
-const current = ref(null)
-
-const { tickets, selected } = defineProps(['tickets', 'selected'])
 
 const options = tickets.map((ticket, index) => ({
     index,
@@ -81,7 +81,7 @@ function cancel() {
 async function trade() {
     state.searching = true
 
-    const response = await FakeHTTPClient.trade(current, "HAS_TRADE")
+    const response = await service.trade(current, selected)
 
     setTimeout(() => {
         state.response = response.status
