@@ -1,6 +1,8 @@
 <template>
-    <div class="rounded-lg shadow-lg grid hover:shadow-xl border border-gray-200 hover:border-brand-main" :class="position">
-        <div class="event-header h-full max-w-full" :style="{ backgroundImage: imageSource }"></div>
+    <div class="rounded-lg shadow-lg grid hover:shadow-xl border border-gray-200 hover:border-brand-main"
+         :class="position">
+        <div class="event-header h-full max-w-full"
+             :style="{ backgroundImage: imageSource }"></div>
         <div class="flex flex-row items-center justify-between gap-8 px-4">
             <div class="font-bold text-2xl">
                 <span class="text-brand-main">{{ month }}</span>
@@ -8,7 +10,7 @@
             </div>
             <div>
                 <span class="text-bold text-center text-3xl"> {{ title }} </span>
-                <p> Estádio do Morumbi</p>
+                <p> {{ location }}</p>
             </div>
         </div>
     </div>
@@ -20,15 +22,20 @@ import FakeImageHttpClient from '../http/FakeImageHttpClient';
 
 const {
     title,
+    location = '',
     vertical = true,
     image = FakeImageHttpClient.randomImage,
     date = Date.now()
 } = defineProps({
     'title': String,
+    'location': String,
     'image': String,
     'vertical': Boolean,
     'date': Date
 })
+
+
+const parsed = new Date(date)
 
 const imageSource = `url(/src/assets/tickets/${image.ticket})`
 
@@ -39,7 +46,7 @@ const position = reactive({
 
 const [day, month] = new Intl
     .DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': 'short' })
-    .format(date)
+    .format(parsed)
     .split(" de ")
 
 </script>

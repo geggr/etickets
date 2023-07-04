@@ -6,8 +6,8 @@ export default class FakeHTTPClient {
         .from({ length: 12 }, (_, index) => index)
         .reduce((accumulator, current) => {
             accumulator.push({
-                id: current,
-                title: `Evento ${current}`,
+                uid: current,
+                event: `Evento ${current}`,
                 date: new Date('2023-06-06')
             })
 
@@ -18,9 +18,9 @@ export default class FakeHTTPClient {
         name: 'Geovani Granieri',
         thumbnail: 'https://randomuser.me/api/portraits/men/75.jpg',
         tickets: [
-            { id: 977, code: '#93721327', title: 'Coldplay: Music of Spheres', date: new Date('2023-08-15') },
-            { id: 1050, code: '#102030', title: 'Festival GP Week', date: new Date('2023-11-20') },
-            { id: 1050, code: '#789123', title: 'São Paulo x Palmeiras', date: new Date('2023-07-05') },
+            { uid: '977', code: '#93721327', name: 'Coldplay: Music of Spheres - pista', event: 'Coldplay: Music of Spheres', date: new Date('2023-08-15') },
+            { uid: '1050', code: '#102030', name: 'Festival GP Week - Camarote', event: 'Festival GP Week', date: new Date('2023-11-20') },
+            { uid: '1050', code: '#789123', name: 'São Paulo x Palmeiras - Arquibancada', event: 'São Paulo x Palmeiras', date: new Date('2023-07-05') },
         ]
     }
 
@@ -55,21 +55,22 @@ export default class FakeHTTPClient {
                 when an unknown printer took a galley of type and scrambled it to make a type specimen book.
             `,
             tickets: [
-                { id: 1, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista Premium' },
-                { id: 2, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Inferior' },
-                { id: 3, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Superior' },
-                { id: 4, country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista' },
-                { id: 5, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Pista Premium' },
-                { id: 6, country: 'Brazil', date: new Date('11-19-2021'), sector: 'Cadeira Inferior' },
+                { uid: '10000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista Premium' },
+                { uid: '20000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Inferior' },
+                { uid: '30000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-11-2021'), sector: 'Cadeira Superior' },
+                { uid: '40000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-11-2021'), sector: 'Pista' },
+                { uid: '50000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-19-2021'), sector: 'Pista Premium' },
+                { uid: '60000000', event: 'Evento 899', name: 'Evento 899', location: 'Pista', country: 'Brazil', date: new Date('11-19-2021'), sector: 'Cadeira Inferior' },
             ]
         }
     }
 
     static async trade(userTicket, interestTicket) {
+        // const expected = ((Math.round(Math.random() * 100) % 2) === 0)
+        //     ? 'HAS_TRADE'
+        //     : 'CREATED_INTERESS'
 
-        const expected = ((Math.round(Math.random() * 100) % 2) === 0)
-            ? 'HAS_TRADE'
-            : 'CREATED_INTERESS'
+        const expected = 'HAS_TRADE'
 
         if (expected === 'HAS_TRADE') {
             return {

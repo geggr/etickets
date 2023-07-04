@@ -12,9 +12,10 @@
             <div class="flex flex-wrap gap-x-8 gap-y-10 mt-8">
                 <event-card v-for="(ticket, index) in state.tickets"
                             :index="ticket.id"
-                            :title="ticket.title"
+                            :title="ticket.event"
+                            :location="ticket.location"
                             :image="ticket.image"
-                            :date="ticket.date"
+                            :date="ticket.datetime"
                             :vertical="false" />
             </div>
 
@@ -33,7 +34,8 @@
                                 v-for="ticket in state.ticketsForSearch"
                                 v-show="ticket.visible"
                                 :key="ticket.id"
-                                :title="ticket.title"
+                                :title="ticket.event"
+                                :location="ticket.location"
                                 :date="ticket.date"
                                 :image="ticket.image"
                                 @click="routeToEventPage(ticket)" />
@@ -43,15 +45,24 @@
 
 
             <div class="mt-10">
-                <h2 class="text-3xl uppercase font-display text-brand-primary">Pensados em você</h2>
-                <events-card-container>
-                    <event-card vertical
-                                v-for="ticket in state.ticketsForUser"
-                                :key="ticket.id"
-                                :title="ticket.title"
-                                :date="ticket.date"
-                                :image="ticket.image" />
-                </events-card-container>
+
+                <div class="my-10"
+                     v-for="kind in state.ticketsForUser">
+                    <h2 class="text-3xl uppercase font-display text-brand-primary">Porque você tem <strong
+                                class="text-2xl text-brand-main"> " {{ kind.name }} " </strong></h2>
+                    <events-card-container>
+                        <event-card vertical
+                                    v-for="ticket in kind.items"
+                                    :key="ticket.id"
+                                    :title="ticket.event"
+                                    :location="ticket.location"
+                                    :sector="ticket.sector"
+                                    :date="ticket.date"
+                                    :image="ticket.image" />
+                    </events-card-container>
+                </div>
+
+
             </div>
         </container>
 
@@ -64,7 +75,7 @@ import { ref, watch, reactive, onMounted } from 'vue';
 import { useModal } from 'vue-final-modal';
 import { useRouter } from 'vue-router';
 
-import { setTickets, getTickets } from '../store/user';
+import { setTickets, getCurrentUser, getCurrentUserEmail } from '../store/user';
 
 import Confetti from 'vue-confetti-explosion'
 import LoggedHeader from '../components/Header.vue'
@@ -92,20 +103,20 @@ function routeToEventPage(ticket) {
     router.push({
         name: 'Event',
         params: {
-            id: ticket.id
+            id: ticket.uid,
         },
         query: {
+            name: ticket.event,
             kind: ticket.image.kind
-        }
+        },
     })
 }
 
 onMounted(async () => {
-    const response = await service.buildDashboardForUser()
+    const response = await service.buildDashboardForUser(getCurrentUserEmail())
 
-    console.log(response.latest)
     state.tickets = response.tickets
-    state.ticketsForSearch = response.latest.map(it => ({ ...it, visible: true }))
+    state.ticketsForSearch = response.latest.map((it, i) => ({ ...it, visible: i < 6 }))
     state.ticketsForUser = response.selecteds
 
     setTickets(response.tickets)
@@ -113,12 +124,12 @@ onMounted(async () => {
 
 watch(search, (current, _) => {
     if (current === "") {
-        state.ticketsForSearch.forEach(it => it.visible = true)
+        state.ticketsForSearch.forEach((it, i) => it.visible = i < 6)
         return
     }
 
     state.ticketsForSearch.forEach(it => {
-        const shouldShowEvent = it.title.toUpperCase().includes(current.toUpperCase())
+        const shouldShowEvent = it.event.toUpperCase().includes(current.toUpperCase())
         it.visible = shouldShowEvent
     })
 })
@@ -128,6 +139,7 @@ const { open, close } = useModal({
     attrs: {
         async onSubmit(ticket) {
             state.tickets.push(ticket)
+            await service.registerTicket(getCurrentUserEmail(), ticket)
             close()
         }
     }

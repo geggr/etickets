@@ -1,10 +1,17 @@
 <template>
     <logged-header />
 
-    <container class="mt-4">
-        <div class="event-banner block w-full h-60 rounded-3xl" :style="{ backgroundImage: banner }"></div>
-        <h1 class="font-display text-3xl">{{ event.title }}</h1>
-        <p class="mt-8 text-lg max-w-3xl">
+    <container class="mt-4 relative">
+        <div class="event-banner block w-full h-60 rounded-3xl"
+             :style="{ backgroundImage: banner }"></div>
+
+        <confetti v-if="showConfetti"
+                  :particleCount="300"
+                  :duration="5000"
+                  :stageWidth="1000"
+                  class="absolute inset-1/2" />
+        <h1 class="mt-4 font-display text-3xl">{{ event.name }}</h1>
+        <p class="mt-8 text-lg">
             {{ event.description }}
         </p>
     </container>
@@ -15,11 +22,11 @@
         </div>
     </container>
 
-
     <container class="mt-10">
         <table class="table-auto w-full">
             <thead>
                 <tr class="text-left">
+                    <th>Identificador</th>
                     <th>Lugar</th>
                     <th>Data</th>
                     <th>Setor</th>
@@ -27,13 +34,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(ticket, index) in event.tickets" :key="index">
-                    <td>{{ ticket.country }}</td>
+                <tr v-for="(ticket, index) in event.tickets"
+                    :key="index">
+                    <td>#{{ ticket.uid.substring(0, 6) }}</td>
+                    <td>{{ ticket.location }}</td>
                     <td>{{ formatter.format(ticket.date) }}</td>
                     <td>{{ ticket.sector }}</td>
                     <td>
                         <button @click="buildTradeModal(ticket)"
-                            class="px-8 py-4 rounded-md bg-green-700 font-bold text-white">Trocar Ingresso</button>
+                                class="px-8 py-4 rounded-md bg-green-700 font-bold text-white">Trocar Ingresso</button>
                     </td>
                 </tr>
             </tbody>
@@ -47,6 +56,7 @@ import { useModal } from 'vue-final-modal';
 
 import state from '../store/user';
 
+import Confetti from 'vue-confetti-explosion'
 import Container from '../components/Container.vue';
 import LoggedHeader from '../components/Header.vue'
 import TradeTicketModal from '../components/modals/TradeTicketModal.vue';
@@ -58,10 +68,11 @@ const { id } = defineProps(['id'])
 
 const service = new TicketService()
 const route = useRoute()
-const kind = route.query.kind
+const { kind, name } = route.query
 
 const event = ref({})
 const selected = ref({})
+const showConfetti = ref(false)
 
 const userTickets = state.tickets
 
@@ -70,7 +81,7 @@ const banner = `url(/src/assets/banners/${FakeImageHttpClient.findByKind(kind).b
 const formatter = new Intl.DateTimeFormat('pt-BR', { 'day': '2-digit', 'month': 'long', year: 'numeric' })
 
 onMounted(async () => {
-    const response = await service.loadEvent()
+    const response = await service.loadEvent(name)
     event.value = response
 })
 
@@ -78,12 +89,20 @@ const { open, close } = useModal({
     component: TradeTicketModal,
     attrs: {
         tickets: userTickets,
-        selected,
+        selected: selected,
         onCancel() {
             close()
         },
-        onConfirm(ticketSelectedForTrade) {
-            setTimeout(() => close(), 5000)
+        onConfirm(response) {
+
+            if (response.success) {
+                close()
+                showConfetti.value = true
+            }
+
+            setTimeout(() => {
+                showConfetti.value = false
+            }, 3000)
         }
     }
 })

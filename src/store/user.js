@@ -1,9 +1,7 @@
 import { reactive } from "vue";
 
 const initialState = {
-    current: {
-
-    },
+    current: {},
     tickets: []
 }
 
@@ -30,6 +28,29 @@ export function setTickets(tickets) {
 
 export function getTickets() {
     return state.tickets
+}
+
+export function getCurrentUser() {
+    return state.current
+}
+
+export function getCurrentUserEmail() {
+    return state.current.email ?? ''
+}
+
+export function changeTickets(oldTicket, newTicket) {
+
+    console.log("========== trocando ==================================")
+
+    const index = state.tickets.findIndex(ticket => ticket.uid === oldTicket.uid)
+
+    console.log(index)
+
+    state.tickets.splice(index, 1)
+
+    state.tickets.push(newTicket)
+
+    console.log("========== trocando ==================================")
 }
 
 export default state

@@ -1,28 +1,45 @@
 import FakeHTTPClient from "../http/FakeHTTPClient";
 import FakeImageHttpClient from "../http/FakeImageHttpClient";
+import HttpClient from "../http/HttpClient";
 
 export default class TicketService {
 
-    client = FakeHTTPClient
+    client = HttpClient
+    otherClient = HttpClient
     imageClient = FakeImageHttpClient
 
     async loadTicketsForHomepage() {
-        return await this.client.homepage()
+        const self = this
+        const tickets = await this.client.homepage()
+
+        return tickets.map(ticket => ({
+            ...ticket,
+            date: new Date(ticket.datetime),
+            image: self.imageClient.findByKind(ticket.type)
+        }))
+    }
+
+    async registerTicket(email, ticket) {
+        return await this.client.register(email, ticket)
     }
 
     async buildDashboardForUser(email) {
+        const self = this
 
         const {
             tickets: ticketsWithoutImage,
             latest: latestWithoutImage,
-            selecteds: selectedsWithoutImage
+            selecteds: selectedsWithoutImage,
         } = await this.client.dashboard(email)
 
+        this.mergeImage(ticketsWithoutImage)
+        this.mergeImage(latestWithoutImage)
+        selectedsWithoutImage.forEach(kind => self.mergeImage(kind.items))
 
         return {
-            tickets: this.addImageToTickets(ticketsWithoutImage),
-            latest: this.addImageToTickets(latestWithoutImage),
-            selecteds: this.addImageToTickets(selectedsWithoutImage)
+            tickets: ticketsWithoutImage,
+            latest: latestWithoutImage,
+            selecteds: selectedsWithoutImage
         }
 
     }
@@ -42,6 +59,14 @@ export default class TicketService {
             ...ticket,
             image: self.imageClient.randomImage
         }))
+    }
+
+    mergeImage(tickets) {
+        if (!Array.isArray(tickets)) return
+
+        const self = this
+
+        tickets.forEach(it => it['image'] = self.imageClient.findByKind(it.type))
     }
 
 

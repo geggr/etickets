@@ -2,22 +2,27 @@
     <div class="landing-banner h-[500px]">
         <container class="flex flex-col justify-center items-center gap-y-8 h-full">
             <h1 class="font-display text-5xl text-white text-center uppercase max-w-4xl">Não perca o <strong
-                    class="text-brand-accent">evento</strong> dos seus sonhos</h1>
+                        class="text-brand-accent">evento</strong> dos seus sonhos</h1>
             <h2 class="font-sans text-white text-3xl max-w-2xl text-center">
                 entre para a plataforma de troca de tickets instantâneo e viva os melhores momentos
             </h2>
             <button @click="open"
-                class="bg-[#A32FFF] text-white font-display text-3xl rounded-md py-4 w-1/6 text-center">Entrar</button>
+                    class="bg-[#A32FFF] text-white font-display text-3xl rounded-md py-4 w-1/6 text-center">Entrar</button>
         </container>
     </div>
 
     <container class="mt-16">
         <h3 class="text-4xl font-display">Próximos Eventos</h3>
         <ul class="flex flex-wrap gap-x-16 gap-y-16 mt-10">
-            <event-card v-for="ticket in tickets" :key="index" :title="ticket.title" :date="ticket.date" />
+            <event-card v-for="ticket in tickets"
+                        :key="index"
+                        :title="ticket.event"
+                        :location="ticket.location"
+                        :image="ticket.image"
+                        :date="ticket.date" />
         </ul>
         <router-link to="/dashboard"
-            class="mt-6 block bg-brand-secondary text-white font-display text-3xl rounded-md py-4 w-1/2 text-center mx-auto">Conhecer
+                     class="mt-6 block bg-brand-secondary text-white font-display text-3xl rounded-md py-4 w-1/2 text-center mx-auto">Conhecer
             a Plataforma</router-link>
     </container>
 
@@ -34,7 +39,7 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useModal } from 'vue-final-modal';
 
-import { setCurrentUser } from '../store/user';
+import { getCurrentUser, setCurrentUser } from '../store/user';
 
 import Container from '../components/Container.vue';
 import EventCard from '../components/EventCard.vue';
@@ -61,8 +66,9 @@ const { open, close } = useModal({
                 photo: 'https://randomuser.me/api/portraits/men/68.jpg'
             })
 
-            router.push({ name: 'Dashboard' })
             close()
+
+            router.push({ name: 'Dashboard' })
         }
     }
 })

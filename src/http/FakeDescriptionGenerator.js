@@ -1,0 +1,19 @@
+export default class FakeDescriptionGenerator {
+
+    static database = {
+        'show': `
+            Bem-vindo a essa tour maravilhosa, onde a magia da música ganha vida!
+            Prepare-se para uma experiência inesquecível repleta de energia e entretenimento de tirar o fôlego. Nesses eventos, artistas talentosos sobem ao palco e encantam o público com performances incríveis, que vão desde músicas vibrantes e coreografias elaboradas até acrobacias deslumbrantes e efeitos visuais impressionantes.
+            Cada evento de show é uma jornada emocionante, onde os espectadores são levados a uma atmosfera envolvente e cativante, cheia de luzes brilhantes, sons envolventes e momentos de pura emoção. Seja um concerto de rock energético, um espetáculo de dança eletrizante ou um show de comédia hilariante, esses eventos têm o poder de unir multidões, criar memórias duradouras e transportar os participantes para um mundo mágico de arte e entretenimento. Não perca a chance de participar de um evento de show e vivenciar a paixão, a criatividade e o talento dos artistas enquanto eles trazem à vida um espetáculo único e memorável.
+            Prepare-se para uma noite cheia de diversão, adrenalina e puro deleite para os sentidos!
+        `,
+        'cinema': `Prepare-se para uma experiência cinematográfica arrebatadora! Chega às telonas o filme mais aguardado do ano. Com uma história envolvente, atuações magníficas e efeitos visuais de tirar o fôlego, este filme promete transportar você para um universo de emoções intensas. Prepare-se para rir, chorar, se surpreender e se apaixonar por personagens cativantes. Com uma trama repleta de reviravoltas e momentos de pura adrenalina, este filme é um verdadeiro espetáculo para os sentidos. Traga seus amigos, sua família e embarque nessa jornada inesquecível nas salas de cinema. Não perca a chance de vivenciar o poder do cinema e se deixar levar por uma história que ficará marcada em sua memória para sempre!`,
+        'teather': `Entre no mundo mágico do teatro e deixe-se encantar por uma peça extraordinária! No palco do renomado teatro será apresentada uma produção fascinante que combina talento, emoção e arte. Prepare-se para testemunhar performances brilhantes de atores consagrados, que darão vida a personagens complexos e envolventes. Com diálogos poderosos, cenários deslumbrantes e figurinos impecáveis, esta peça promete transportar você para uma jornada emocionante e repleta de reflexões. Traga seus amigos, sua família e mergulhe nesse espetáculo teatral que vai tocar seu coração e despertar sua imaginação. Garanta seu ingresso e permita-se vivenciar a magia única do teatro!`,
+        'football': `A emoção está no ar! Prepare-se para presenciar o ápice do futebol em uma final épica e imperdível! Semana que vem o estádio será palco da batalha final entre as equipes mais talentosas e determinadas deste campeonato. A tensão será palpável, as torcidas estarão em êxtase e os jogadores mostrarão toda sua habilidade e garra em busca do título tão cobiçado. Esta é a oportunidade de vivenciar momentos que ficarão eternizados na história do esporte. Os dribles geniais, os passes precisos, os chutes poderosos e as defesas impressionantes serão protagonistas em um jogo repleto de reviravoltas e emoções. Venha torcer, cantar e vibrar intensamente com a energia contagiante deste evento esportivo de tirar o fôlego! Prepare-se para testemunhar a glória, a rivalidade e a paixão do futebol em sua forma mais pura. Garanta seu lugar na final do campeonato e faça parte deste momento único, onde a determinação se transformará em história e um time sairá consagrado como o grande campeão. Não fique de fora dessa experiência inesquecível!`
+    }
+
+
+    static generateForKind(kind) {
+        return FakeDescriptionGenerator.database[kind] ?? ''
+    }
+}
